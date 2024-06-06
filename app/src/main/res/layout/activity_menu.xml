@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id = "@+id/main"
+    tools:context=".MenuActivity"
+    android:background="@color/violeta_clara">
+
+    <!-- Barra de navegación -->
+    <LinearLayout
+        android:id="@+id/navigationBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="?attr/colorPrimary"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/btnProfile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Perfil"
+            android:textColor="@android:color/white"
+            android:background="?attr/selectableItemBackground" />
+
+        <Button
+            android:id="@+id/btnViewDogs"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Ver Perros"
+            android:textColor="@android:color/white"
+            android:background="?attr/selectableItemBackground" />
+    </LinearLayout>
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/ViewPager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/navigationBar"
+            />
+
+
+
+
+</RelativeLayout>
