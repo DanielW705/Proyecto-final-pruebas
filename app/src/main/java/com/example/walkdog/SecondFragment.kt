@@ -1,3 +1,4 @@
+import SecondFragmentArgs.*
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -17,7 +18,10 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.navArgs
 import com.example.walkdog.Dogs
+import com.example.walkdog.PerroViewModel
 import com.example.walkdog.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -30,11 +34,19 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlin.random.Random
 
-class SecondFragment(val perros: List<Dogs>) : Fragment(), OnMapReadyCallback,
+class SecondFragment(private val perros: PerroViewModel) : Fragment(), OnMapReadyCallback,
     ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMyLocationButtonClickListener,
     GoogleMap.OnMyLocationClickListener {
 
     private lateinit var map: GoogleMap
+
+    private var perroLocation: LatLng? = null
+
+    private val args: SecondFragmentArgs by navArgs()
+
+    companion object {
+        fun newInstance(listadePerros: PerroViewModel) = SecondFragment(listadePerros)
+    }
 
     private lateinit var handler: Handler
 
@@ -46,7 +58,7 @@ class SecondFragment(val perros: List<Dogs>) : Fragment(), OnMapReadyCallback,
     }
 
     private fun DogsMove() {
-        for (perro in perros) {
+        perros.ListDogs.value?.forEach { perro ->
             perro.loc =
                 LatLng(
                     perro.loc.latitude + generateRandomOffset(
@@ -66,6 +78,7 @@ class SecondFragment(val perros: List<Dogs>) : Fragment(), OnMapReadyCallback,
         val mapFragment: SupportMapFragment =
             childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
     }
 
     override fun onCreateView(
@@ -78,9 +91,11 @@ class SecondFragment(val perros: List<Dogs>) : Fragment(), OnMapReadyCallback,
 
         handler = Handler(Looper.getMainLooper())
         createFragment()
+//        if (arguments != null) {
+//            perroLocation = args.DogLocation
+//        }
         return view
     }
-
 
     private fun CreateDogsMarker(coordinates: LatLng?) {
 
@@ -97,7 +112,7 @@ class SecondFragment(val perros: List<Dogs>) : Fragment(), OnMapReadyCallback,
         if (coordinates != null) {
 
 
-            perros.forEachIndexed { index, perro ->
+            perros.ListDogs.value?.forEachIndexed { index, perro ->
                 perro.loc =
                     LatLng(
                         coordinates.latitude + (generateRandomOffset(
@@ -116,7 +131,7 @@ class SecondFragment(val perros: List<Dogs>) : Fragment(), OnMapReadyCallback,
                 map.addMarker(marker)
             }
         } else {
-            for (perro in perros) {
+            perros.ListDogs.value?.forEach { perro ->
                 val marker: MarkerOptions =
                     MarkerOptions().position(perro.loc).title(perro.name)
                         .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
@@ -162,6 +177,12 @@ class SecondFragment(val perros: List<Dogs>) : Fragment(), OnMapReadyCallback,
         map.setOnMyLocationClickListener(this)
         createMarker()
         handler.post(PerroRunnable)
+        perros.ListDogs.observe(viewLifecycleOwner, Observer { dogs ->
+            updateMap(dogs)
+        })
+        perroLocation?.let { location ->
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 18f))
+        }
     }
 
     override fun onMyLocationButtonClick(): Boolean {
@@ -173,5 +194,10 @@ class SecondFragment(val perros: List<Dogs>) : Fragment(), OnMapReadyCallback,
 
     private fun generateRandomOffset(min: Double, max: Double): Double {
         return (Random.nextDouble() * (max - min) + min) * (if (Random.nextBoolean()) 1 else -1)
+    }
+
+    private fun updateMap(dogs: List<Dogs>) {
+        map.clear()
+        CreateDogsMarker(null)
     }
 }

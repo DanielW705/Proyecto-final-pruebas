@@ -7,23 +7,19 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walkdog.Dogs
+import com.example.walkdog.PerroViewModel
 import com.example.walkdog.R
 import com.google.android.gms.maps.model.LatLng
 
-class ViewPagerAdapter(fragmentManager: FragmentManager) : FragmentPagerAdapter(fragmentManager) {
+class ViewPagerAdapter(fragmentManager: FragmentManager, private val listaDeDogs: PerroViewModel) : FragmentPagerAdapter(fragmentManager) {
 
-    private var Listadeperros: List<Dogs> = listOf(
-        Dogs("Buddy", LatLng(37.7749, -122.4194)),
-        Dogs("Max", LatLng(34.0522, -118.2437)),
-        Dogs("Bella", LatLng(40.7128, -74.0060)),
-        Dogs("Lucy", LatLng(51.5074, -0.1278))
-    )
+
 
     override fun getItem(position: Int): Fragment {
         // Devuelve el fragmento correspondiente a la posición
         return when (position) {
-            0 -> FirstFragment(Listadeperros)
-            1 -> SecondFragment(Listadeperros)
+            0 -> FirstFragment(listaDeDogs)
+            1 -> SecondFragment(listaDeDogs)
             else -> throw IllegalArgumentException("Invalid position: $position")
         }
     }
